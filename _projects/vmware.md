@@ -61,3 +61,6 @@ We set up Remote Authentication Dial In User Service(RADIUS) on the Cisco switch
 ![](../images/vmware/vmware7.PNG)
 ![](../images/vmware/vmware5.PNG)
 ![](../images/vmware/vmware6.PNG)
+
+{% include elements/button.html link="../projects/" text="Project Home" block=true %}
+
