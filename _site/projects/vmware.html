@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by yousinix
+  Free for personal and commercial use under the MIT license
+  https://github.com/yousinix/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  
+  
+  
+
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="VMWare Capstone Project">
+  <meta property="og:description" content="Some documentation I did on my cyber capstone project at SCCC.">
+  <meta property="og:image" content="../images/vmware.jpg">
+
+  <title>VMWare Capstone Project</title>
+  <meta name="description" content="Some documentation I did on my cyber capstone project at SCCC.">
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Theme style -->
+  <script src="/assets/js/theme.js"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+
+
+<body class="h-100 d-flex flex-column">
+
+  <main class="flex-shrink-0 container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-themed">
+
+  <a class="navbar-brand" href="/"><h5><b>Matts portfolio</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-1x fa-bars text-themed"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link active" href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+      <span id="theme-toggler" class="nav-item nav-link" role="button" onclick="toggleTheme()"></span>
+    </div>
+  </div>
+
+</nav>
+    <div class="col-lg-10 mx-auto mt-5 markdown-body">
+  <h2 id="about">About</h2>
+<p>This page demonstrates the capstone project I did at SCCC where I created a simulated network using VMware Esxi and cisco switches and routers.</p>
+
+<h2 id="topology">Topology</h2>
+<p>In the network we had 2 Domain controllers, 1 windows 10 client, 1 web server, and 1 nagios server running on vmware. For the physical connection we had a layer 3 cisco switch.
+<img src="../images/vmware/vmware1.PNG" alt="" /></p>
+
+<h2 id="dhcp">DHCP</h2>
+<p>We created a DHCP server on DC1. We created network scopes for the classroom and virtual VLANS. With DHCP we no longer had to manually set our IP each time we used the network.</p>
+
+<p>Range for Virtual Computers
+<img src="../images/vmware/DHCPrange1.png" alt="" />
+Range for Classroom Computers
+<img src="../images/vmware/DHCPrange2.png" alt="" />
+DHCP Scopes
+<img src="../images/vmware/DHCPranges.png" alt="" /></p>
+<h2 id="vlans">VLANS</h2>
+<p>We created several VLANS including, a DMZ zone, Parking Lot, cisco devices, virtual clients, physical clients, and managment network/servers. Each vlan is created as a separate interface on the switch. The ip-helper-address is applied to each interface so they can receive IP addresses from the DHCP server.
+<img src="../images/vmware/vmware2.PNG" alt="" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>interface Vlan1
+ ip address 10.106.0.1 255.255.255.0
+ ip helper-address 10.106.30.3
+!
+interface Vlan10
+ ip address 10.106.10.1 255.255.255.0
+ ip helper-address 10.106.30.3
+!
+interface Vlan20
+ ip address 10.106.20.1 255.255.255.0
+ ip helper-address 10.106.30.3
+!
+interface Vlan30
+ ip address 10.106.30.1 255.255.255.0
+!
+interface Vlan40
+ ip address 10.106.40.1 255.255.255.0
+ ip helper-address 10.106.0.3
+!
+interface Vlan99
+ ip address 10.106.99.1 255.255.255.0
+!
+</code></pre></div></div>
+<h2 id="webserver">Webserver</h2>
+<p>Inside the Demilitarized Zone(DMZ) we all created a web server. This is a super basic web server I made that had a file that once downloaded would spam a pop up on windows. 
+<img src="../images/vmware/vmware3.PNG" alt="" />
+When someone clicks “here” it downloads a file. When the file is ran it spams a windows popup until the user kills the script in task manager. 
+<img src="../images/vmware/vmware4.PNG" alt="" /></p>
+
+<h2 id="setting-up-radius">Setting up RADIUS</h2>
+<p>We set up Remote Authentication Dial In User Service(RADIUS) on the Cisco switch. We then utilized the network Policy Server in Active Directory. We created two users in the Networking OU to represent an IT department. The first one is a Network Engineer and the second is a Network Technician. I used <a href="https://www.ciscozine.com/manage-cisco-with-nps-radius/">this</a> tutorial to assist in setting up radiusWe set up Remote Authentication Dial In User Service(RADIUS) on the Cisco switch. We gave read permissions to the Net-tec group and full permissions to the net-eng group
+<img src="../images/vmware/vmware8.PNG" alt="" />
+<img src="../images/vmware/vmware7.PNG" alt="" />
+<img src="../images/vmware/vmware5.PNG" alt="" />
+<img src="../images/vmware/vmware6.PNG" alt="" /></p>
+
+</div>
+  </main>
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>m121499</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center"><a class="social mx-1"  href="mailto:matthewwaskiewicz@outlook.com"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#db4437'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fas fa-envelope fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.github.com/m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#333333'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-github fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.linkedin.com/in/matthew-waskiewicz-493619301"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#007bb5'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-linkedin-in fa-1x"></i>
+    </a><a class="social mx-1"  href="https://medium.com/@m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#00ab6c'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-medium fa-1x"></i>
+    </a>
+
+</div><small id="attribution">
+    theme <a href="https://github.com/yousinix/portfolYOU">portfolYOU</a>
+  </small>
+
+</footer>
+
+  
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by yousinix
+  Free for personal and commercial use under the MIT license
+  https://github.com/yousinix/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  
+  
+  
+
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Configuring the Web Server">
+  <meta property="og:description" content="Welcome to my site!">
+  <meta property="og:image" content="/images/rubiks.jpg">
+
+  <title>Configuring the Web Server</title>
+  <meta name="description" content="Welcome to my site!">
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Theme style -->
+  <script src="/assets/js/theme.js"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+
+
+<body class="h-100 d-flex flex-column">
+
+  <main class="flex-shrink-0 container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-themed">
+
+  <a class="navbar-brand" href="/"><h5><b>Matts portfolio</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-1x fa-bars text-themed"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+      <span id="theme-toggler" class="nav-item nav-link" role="button" onclick="toggleTheme()"></span>
+    </div>
+  </div>
+
+</nav>
+    <div class="col-lg-10 mx-auto mt-5 markdown-body">
+  <h1 id="configuring-the-web-server">Configuring the Web Server</h1>
+
+<p>For the web server I used Ubuntu server 22.04.</p>
+
+<h2 id="getting-access-to-the-domain">Getting access to the domain</h2>
+<p>I wanted to learn how to set up DHCP reservations in Active Directory, so I set up a DHCP reservation for the web server. Although statically assigned addresses are generally preferred for servers in most networks, I wanted practice making DHCP reservations. One challenge I encountered was that the web server was not receiving the correct address. After doing some research, I discovered that I had to modify the /etc/netplan/file.yaml in order to receive the correct MAC address and gain access to the domain.
+<img src="/images/Pasted%20image%2020240709140544.png" alt="" />
+Next I created a DHCP reservation on the domain controller. 
+<img src="/images/DHCPreservation.png" alt="" /></p>
+<h1 id="front-end">Front End</h1>
+<p>After getting attached to the network, I began setting up the web server. I used a LAMP stack to create the web server. I used Apache as my web host, Mysql for the backend database, and PHP as the intermediary language. 
+This is the source code of the index.php page. I used this <a href="https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_login_form">website</a> to help with the html and css. After setting up the front end, I moved on to creating a SSL Certificate
+<img src="/images/index.png" alt="" />
+What the front end originally looked like
+<img src="/images/originalindex.png" alt="" /></p>
+<h1 id="ssl-certificate">SSL Certificate</h1>
+<p>Next I focused on adding an SSL certicate to the web server. As you probably know, HTTP is an insecure protocol that sends all data without any encryption. This is why I used an Active Directory Certifcate Server to create a trusted certifcate for my web server.</p>
+
+<p>The first step in geting my certifcate was to create a request using openssl on the web server.
+<img src="/images/correctcertreqforchrome.png" alt="" /></p>
+
+<hr />
+
+<p>ABSTRACT: Something very important to note about this request is the SubjectAltName portion. When I first created the certificate and attempted to use it on chrome, it was still appearing as insecure. It took me a while to figure out what was causing this issue. Afer doing some research online I found this <a href="https://stackoverflow.com/questions/67184724/why-ssl-certificate-only-works-in-internet-explorer">post</a> . I then recreated the certificate with the SubjectAltName and went through the process again, and no longer received the error.</p>
+
+<hr />
+
+<p>After creating the request on Ubuntu, and transferring the file to the Windows DC1. I visited the Certificate Server web page(DC2) 
+<img src="/images/gettingcertificate.png" alt="" />
+I then got the certificate, added it to the group policy as a trusted cert, and transferred it back to the ubuntu server
+<img src="/images/gpcert.png" alt="" />
+<img src="/images/copycert.png" alt="" />
+After getting the certificate on ubuntu I ran the following commands.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo cp</span> <span class="s2">"certnew (1).cer"</span> /etc/ssl/certs/web1new.crt
+<span class="nb">sudo cp </span>web1new.key /etc/ssl/private/
+</code></pre></div></div>
+
+<hr />
+
+<p>ABSTRACT:Originally, I modified the default-ssl.conf file and added the certifcatefile path and certificate file path key there. This allowed me to access the website via HTTPS, however, there was no redirect when visiting from HTTP.</p>
+
+<hr />
+
+<h1 id="http-redirect">HTTP Redirect</h1>
+<p>I created a new file in the /etc/apache2/sites-available directory named “192.168.1.103.conf”. I created this file so that when visiting the HTTP version of the site, you would be redirected to the HTTPS version. 
+<img src="/images/http-https.png" alt="" />
+Lastly, to apply these changes I ran the following commands</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>a2ensite 192.168.1.103.conf
+<span class="nb">sudo </span>systemctl reload apache2
+</code></pre></div></div>
+<p>Now when you access the site you will be redirected to the sercure version with no certificate warning.
+<img src="/images/noerroronchrome.png" alt="" /></p>
+
+<hr />
+
+<h1 id="backend">Backend</h1>
+<p>For the backend, I created a database named Users with a table called users. Here is a selection of the data in the database. 
+<img src="/images/db1.png" alt="" />
+This is the original authentication code used to connect the database to the front end. As you may have noticed, the code is vulnerable to SQL injection.</p>
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?php</span>
+
+<span class="nb">session_start</span><span class="p">();</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$_SERVER</span><span class="p">[</span><span class="s1">'REQUEST_METHOD'</span><span class="p">]</span> <span class="o">===</span> <span class="s1">'GET'</span><span class="p">)</span> <span class="p">{</span>
+	<span class="c1">//Deny access to authenitcation page</span>
+	<span class="nb">http_response_code</span><span class="p">(</span><span class="mi">403</span><span class="p">);</span>
+	<span class="k">die</span><span class="p">();</span>
+	<span class="nb">header</span><span class="p">(</span><span class="s1">'HTTP/1.1 403 Forbidden'</span><span class="p">);</span>
+
+<span class="p">}</span>
+<span class="nv">$servername</span> <span class="o">=</span> <span class="s2">"localhost"</span><span class="p">;</span>
+<span class="nv">$username</span> <span class="o">=</span> <span class="s2">"Administrator"</span><span class="p">;</span>
+<span class="nv">$password</span> <span class="o">=</span> <span class="s2">"p@ssw0rd"</span><span class="p">;</span>
+<span class="nv">$dbname</span> <span class="o">=</span> <span class="s2">"users"</span><span class="p">;</span>
+
+<span class="c1">//create connection</span>
+<span class="nv">$conn</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">mysqli</span><span class="p">(</span><span class="nv">$servername</span><span class="p">,</span> <span class="nv">$username</span><span class="p">,</span> <span class="nv">$password</span><span class="p">,</span> <span class="nv">$dbname</span><span class="p">);</span>
+
+<span class="k">if</span> <span class="p">(</span><span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">)</span> <span class="p">{</span>
+	<span class="k">die</span><span class="p">(</span><span class="s2">"Connection Failed: "</span> <span class="mf">.</span> <span class="nv">$conn</span><span class="o">-&gt;</span><span class="n">connect_error</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">//retrieve values from html form</span>
+<span class="nv">$entered_user</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'uname'</span><span class="p">];</span>
+<span class="nv">$entered_pass</span> <span class="o">=</span> <span class="nv">$_POST</span><span class="p">[</span><span class="s1">'passwd'</span><span class="p">];</span>
+
+<span class="c1">//query database</span>
+<span class="nv">$sql</span> <span class="o">=</span> <span class="s2">"SELECT * FROM users WHERE username='</span><span class="nv">$entered_user</span><span class="s2">' AND password='</span><span class="nv">$entered_pass</span><span class="s2">'"</span><span class="p">;</span>
+<span class="nv">$result</span> <span class="o">=</span> <span class="nf">mysqli_query</span><span class="p">(</span><span class="nv">$conn</span><span class="p">,</span> <span class="nv">$sql</span><span class="p">);</span>
+<span class="nv">$row</span> <span class="o">=</span> <span class="nf">mysqli_fetch_array</span><span class="p">(</span><span class="nv">$result</span><span class="p">,</span> <span class="no">MYSQLI_ASSOC</span><span class="p">);</span>
+<span class="nv">$count</span> <span class="o">=</span> <span class="nf">mysqli_num_rows</span><span class="p">(</span><span class="nv">$result</span><span class="p">);</span>
+
+<span class="k">if</span><span class="p">(</span><span class="nv">$count</span> <span class="o">==</span> <span class="mi">1</span><span class="p">){</span>
+	<span class="nv">$_SESSION</span><span class="p">[</span><span class="s1">'username'</span><span class="p">]</span> <span class="o">=</span> <span class="nv">$row</span><span class="p">[</span><span class="s1">'username'</span><span class="p">];</span>
+	<span class="nb">header</span><span class="p">(</span><span class="s2">"Location: creds.php"</span><span class="p">);</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+	<span class="k">echo</span> <span class="s2">"Incorrect Username or Password!"</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>If the user enters the correct credentials, the website will forward them to this page. 
+<img src="/images/login.png" alt="" />
+<img src="/images/loggedin.png" alt="" />
+If a user enters the wrong credentials, they receive this message. 
+<img src="/images/wrongcreds.png" alt="" /></p>
+
+<p><a class="m-1 btn btn-outline-primary btn-3 btn-block" href="../pages/webserver2.html">
+  Web Server Part 2
+</a></p>
+
+<p><a class="m-1 btn btn-outline-primary btn-3 btn-block" href="../projects/activedirectory">
+  Project Home
+</a></p>
+
+</div>
+  </main>
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>m121499</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center"><a class="social mx-1"  href="mailto:matthewwaskiewicz@outlook.com"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#db4437'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fas fa-envelope fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.github.com/m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#333333'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-github fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.linkedin.com/in/matthew-waskiewicz-493619301"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#007bb5'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-linkedin-in fa-1x"></i>
+    </a><a class="social mx-1"  href="https://medium.com/@m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#00ab6c'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-medium fa-1x"></i>
+    </a>
+
+</div><small id="attribution">
+    theme <a href="https://github.com/yousinix/portfolYOU">portfolYOU</a>
+  </small>
+
+</footer>
+
+  
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+
+</html>

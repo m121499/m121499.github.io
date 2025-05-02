@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by yousinix
+  Free for personal and commercial use under the MIT license
+  https://github.com/yousinix/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  
+  
+  
+
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Getting onto the network">
+  <meta property="og:description" content="Welcome to my site!">
+  <meta property="og:image" content="/images/rubiks.jpg">
+
+  <title>Getting onto the network</title>
+  <meta name="description" content="Welcome to my site!">
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Theme style -->
+  <script src="/assets/js/theme.js"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+
+
+<body class="h-100 d-flex flex-column">
+
+  <main class="flex-shrink-0 container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-themed">
+
+  <a class="navbar-brand" href="/"><h5><b>Matts portfolio</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-1x fa-bars text-themed"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+      <span id="theme-toggler" class="nav-item nav-link" role="button" onclick="toggleTheme()"></span>
+    </div>
+  </div>
+
+</nav>
+    <div class="col-lg-10 mx-auto mt-5 markdown-body">
+  <h1 id="getting-onto-the-network">Getting onto the network</h1>
+
+<p>For this LAB I simulated an internal attacker. I connected my kali box to the network and got an IP address via DHCP.
+<img src="/images/kaliip.png" alt="" /></p>
+
+<p>After getting connected to the network, I started my reconnaissance with an nmap ping sweep of the network.
+<img src="/images/nmap1.png" alt="" /></p>
+
+<p>As seen in the image above, there are 3 servers and 1 windows client.</p>
+
+<h2 id="llmnrnetbios-poisoining">LLMNR/NetBios Poisoining</h2>
+<p>I started my attack with responder. Responder is a relatively passive tool that abuses LLMNR/Netbios to listen for failed connections and get the hash for that user.
+<img src="/images/responder.png" alt="" /></p>
+
+<p>I then simulated a user visiting a share on the network
+<img src="/images/Pasted%20image%2020240809183029.png" alt="" /></p>
+
+<p>Responder was able to capture this hash and I used hashcat to crack it.
+<img src="/images/Pasted%20image%2020240809183003.png" alt="" />
+<img src="/images/Pasted%20image%2020240809183501.png" alt="" />
+<img src="/images/Pasted%20image%2020240809183830.png" alt="" /></p>
+
+<h1 id="enumerating-with-credentials">Enumerating with credentials</h1>
+
+<p>I used NetExec to enumerate the Domain Controller via SMB. I started by listing shares test.user has access to. The user only has access to Sales because it is a member of Sales.
+<img src="/images/nxc1.png" alt="" /></p>
+
+<p>I used NetExec to list Domain users and then output the users to a file.
+<img src="/images/nxc2.png" alt="" />
+<img src="/images/nxc3.png" alt="" /></p>
+
+<h1 id="enumerating-service-principal-names-kerberoasting">Enumerating Service Principal Names (Kerberoasting)</h1>
+
+<p>I utilized the list of users and the test.user credentials to find any users with a SPN set. I was able to find the backupservice account is kerberoastable. After getting the hash I was able to crack and get the password for the backupservice user.
+<img src="/images/spn1.png" alt="" />
+<img src="/images/spn2.png" alt="" />
+<img src="/images/spn4.png" alt="" />
+<img src="/images/spn3.png" alt="" /></p>
+
+<h1 id="enumerating-for-as-rep-roasting">Enumerating for AS-REP Roasting</h1>
+
+<p>I also disabled Kerberos preauthentication on an account to perform an AS-REP roasting attack. After getting the hash I was able to crack the password for paule.raune
+<img src="/images/asrep1.png" alt="" />
+<img src="/images/asrep2.png" alt="" />
+<img src="/images/asrep3.png" alt="" />
+<img src="/images/asrep4.png" alt="" /></p>
+
+<h1 id="escalating-privileges-to-domain-admin">Escalating Privileges to Domain Admin.</h1>
+
+<p>I checked what shares the Backup Service user had access to.
+<img src="/images/backupserv.png" alt="" /></p>
+
+<p>Since the user has access to the IT group I can assume it is a member of that group. I used this command to verify it.
+<img src="/images/itgroup.png" alt="" /></p>
+
+<p>I also used the backupservice account to check the members of the domain admins group. Looking at the output I noticed j.robinson who is a member of the IT group is also a member of domain admins.
+<img src="/images/domadmins.png" alt="" /></p>
+
+<p>I decided to check out the IT share to see if I could find anymore information. Looking at the share there is a file called passwords.txt with a list of passwords. I used this list to perform a password spray with the previously found users.
+<img src="/images/smb.png" alt="" />
+<img src="/images/pass-spray.png" alt="" /></p>
+
+<p>Looking at the output I got a sucessful password combination <code class="language-plaintext highlighter-rouge">j.robinson:jd,2&lt;n31di9</code>
+<img src="/images/pwned.png" alt="" /></p>
+
+<h1 id="getting-all-users-passwords">Getting All Users passwords</h1>
+<p>After getting Domain administrator credentials I used RDP to connect to the Certificate server.
+<img src="/images/rdp.png" alt="" /></p>
+
+<p>Once connected I uploaded mimikatz and ran the following commands to get the hash of every user in the domain. I used log within mimikatz to get a file containing the output
+<img src="/images/mimikatz.png" alt="" />
+<img src="/images/mimi2.png" alt="" />
+<img src="/images/mimi3.png" alt="" />
+<img src="/images/mimi4.png" alt="" />
+<img src="/images/mimi5.png" alt="" /></p>
+
+<p>After obtaining all the hashes and transferring them to my attacker machine via SMB, I used hashcat to bruteforce all of them.
+<img src="/images/awk.png" alt="" />
+<img src="/images/hashcat.png" alt="" />
+<img src="/images/cracked.png" alt="" /></p>
+
+<p>Lastly, I used a python script to take each hash and password combination and match it to a username from the mimikatz log.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load hash:password pair into a dictionary.
+</span><span class="n">hash_to_password</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'cracked.txt'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">hashpass</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">hashpass</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="s">':'</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">hash_val</span><span class="p">,</span> <span class="n">password</span> <span class="o">=</span> <span class="n">parts</span>
+            <span class="n">hash_to_password</span><span class="p">[</span><span class="n">hash_val</span><span class="p">.</span><span class="n">strip</span><span class="p">()]</span> <span class="o">=</span> <span class="n">password</span><span class="p">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="c1"># Process the user and hash from the mimikatz.log and output to a file with a user:pass pair
+</span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'mimikatz.log'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">mimi</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="s">'matched_output.txt'</span><span class="p">,</span> <span class="s">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">output_file</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">mimi</span><span class="p">:</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">hash_val</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">].</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">password</span> <span class="o">=</span> <span class="n">hash_to_password</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">hash_val</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">password</span><span class="p">:</span>
+                <span class="n">output_file</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s">"</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>Output:
+<img src="/images/user-pass.png" alt="" /></p>
+
+<p><a class="m-1 btn btn-outline-primary btn-3 btn-block" href="../projects/activedirectory">
+  Project Home
+</a></p>
+
+
+</div>
+  </main>
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>m121499</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center"><a class="social mx-1"  href="mailto:matthewwaskiewicz@outlook.com"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#db4437'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fas fa-envelope fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.github.com/m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#333333'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-github fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.linkedin.com/in/matthew-waskiewicz-493619301"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#007bb5'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-linkedin-in fa-1x"></i>
+    </a><a class="social mx-1"  href="https://medium.com/@m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#00ab6c'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-medium fa-1x"></i>
+    </a>
+
+</div><small id="attribution">
+    theme <a href="https://github.com/yousinix/portfolYOU">portfolYOU</a>
+  </small>
+
+</footer>
+
+  
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+
+</html>

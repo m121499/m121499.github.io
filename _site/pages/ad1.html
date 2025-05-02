@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by yousinix
+  Free for personal and commercial use under the MIT license
+  https://github.com/yousinix/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  
+  
+  
+
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Users and Permissions">
+  <meta property="og:description" content="Welcome to my site!">
+  <meta property="og:image" content="/images/rubiks.jpg">
+
+  <title>Users and Permissions</title>
+  <meta name="description" content="Welcome to my site!">
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Theme style -->
+  <script src="/assets/js/theme.js"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+
+
+<body class="h-100 d-flex flex-column">
+
+  <main class="flex-shrink-0 container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-themed">
+
+  <a class="navbar-brand" href="/"><h5><b>Matts portfolio</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-1x fa-bars text-themed"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link " href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+      <span id="theme-toggler" class="nav-item nav-link" role="button" onclick="toggleTheme()"></span>
+    </div>
+  </div>
+
+</nav>
+    <div class="col-lg-10 mx-auto mt-5 markdown-body">
+  <h1 id="users-and-permissions">Users and Permissions</h1>
+<p>Firstly, I created groups and Organizational Units to simulate different departments in an organization. I created an OU and group for every department. After creating the groups I wrote a simple powershell script to automate the creation of users. I created a file of 20 names for each OU and used random passwords from the rockyou database when creating the users. I modified the script for the different OU’s/name lists. 
+<img src="/images/Pasted%20image%2020240808103841.png" alt="test" /></p>
+<div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#Declare username and password variables.</span><span class="w">
+</span><span class="nv">$usernames</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Content</span><span class="w"> </span><span class="s2">"C:\Users\Matt\Desktop\names4.txt"</span><span class="w">
+</span><span class="nv">$passwords</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Get-Content</span><span class="w"> </span><span class="s2">"C:\Users\Matt\Desktop\passwords.txt"</span><span class="w">
+
+</span><span class="c"># Ensure there are the same number of usernames and passwords</span><span class="w">
+</span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nv">$usernames</span><span class="o">.</span><span class="nf">Count</span><span class="w"> </span><span class="o">-ne</span><span class="w"> </span><span class="nv">$passwords</span><span class="o">.</span><span class="nf">Count</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="n">Write-Error</span><span class="w"> </span><span class="s2">"The number of usernames and passwords does not match."</span><span class="w">
+    </span><span class="kr">exit</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span><span class="c"># Loop through usernames and assign a corresponding password</span><span class="w">
+</span><span class="kr">for</span><span class="w"> </span><span class="p">(</span><span class="nv">$i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="nv">$i</span><span class="w"> </span><span class="o">-lt</span><span class="w"> </span><span class="nv">$usernames</span><span class="o">.</span><span class="nf">Count</span><span class="p">;</span><span class="w"> </span><span class="nv">$i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nv">$u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$usernames</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="w">
+    </span><span class="nv">$p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$passwords</span><span class="p">[</span><span class="nv">$i</span><span class="p">]</span><span class="w">
+    </span><span class="nv">$pwd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ConvertTo-SecureString</span><span class="w"> </span><span class="nt">-String</span><span class="w"> </span><span class="nv">$p</span><span class="w"> </span><span class="nt">-AsPlainText</span><span class="w"> </span><span class="nt">-Force</span><span class="w">
+
+    </span><span class="nv">$first</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$u</span><span class="o">.</span><span class="nf">Split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="nf">ToLower</span><span class="p">()</span><span class="w">
+    </span><span class="nv">$last</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">$u</span><span class="o">.</span><span class="nf">Split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="nf">ToLower</span><span class="p">()</span><span class="w">
+
+    </span><span class="n">New-ADUser</span><span class="w"> </span><span class="nt">-Name</span><span class="w"> </span><span class="s2">"</span><span class="nv">$first</span><span class="s2"> </span><span class="nv">$last</span><span class="s2">"</span><span class="w"> </span><span class="nt">-GivenName</span><span class="w"> </span><span class="s2">"</span><span class="nv">$first</span><span class="s2">"</span><span class="w"> </span><span class="nt">-Surname</span><span class="w"> </span><span class="s2">"</span><span class="nv">$last</span><span class="s2">"</span><span class="w"> </span><span class="nt">-SamAccountName</span><span class="w"> </span><span class="s2">"</span><span class="nv">$first</span><span class="s2">.</span><span class="nv">$last</span><span class="s2">"</span><span class="w"> </span><span class="nt">-Path</span><span class="w"> </span><span class="s2">"OU=IT, DC=MATT, DC=corp"</span><span class="w"> </span><span class="nt">-PasswordNeverExpires</span><span class="w"> </span><span class="bp">$true</span><span class="w"> </span><span class="nt">-AccountPassword</span><span class="w"> </span><span class="nv">$pwd</span><span class="w"> </span><span class="nt">-Enabled</span><span class="w"> </span><span class="bp">$true</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>After creating users and groups, I added some user access controls. I created group policy objects for every department and applied some restrictions to certain departments. For example, users in sales can not open command prompt, control panel, or powershell. 
+<img src="/images/Pasted%20image%2020240402184444.png" alt="" />
+<img src="/images/Pasted%20image%2020240402185207.png" alt="" />
+<img src="/images/Pasted%20image%2020240402185252.png" alt="" />
+When attempting to block PowerShell I learned that it is not as simple as disabling command prompt. I had to create a rule to the path where PowerShell is for both the x64 and x86 versions. Furthermore, I created separate rules to block PowerShell ISE. 
+<img src="/images/Pasted%20image%2020240402191415.png" alt="" /></p>
+
+<p>Below is a demonstration of the user access controls using a user named test user. Test User is a member of the Sales department.</p>
+<figure class="figure w-100">
+  <img src="/images/testuser.png" class="figure-img img-fluid rounded" alt="Test User Logged Onto Windows Client" /><figcaption class="figure-caption text-center">Test User Logged Onto Windows Client</figcaption></figure>
+<p><img src="/images/controlpanelblockedfortestuser.png" alt="" /></p>
+<figure class="figure w-100">
+  <img src="/images/blockedmessage.png" class="figure-img img-fluid rounded" alt="Control Panel Blocked" /><figcaption class="figure-caption text-center">Control Panel Blocked</figcaption></figure>
+<figure class="figure w-100">
+  <img src="/images/commandpromptblockedfortestuser.png" class="figure-img img-fluid rounded" alt="Command Prompt Blocked" /><figcaption class="figure-caption text-center">Command Prompt Blocked</figcaption></figure>
+
+<figure class="figure w-100">
+  <img src="/images/Pasted%20image%2020240402190207.png" class="figure-img img-fluid rounded" alt="Powershell Blocked" /><figcaption class="figure-caption text-center">Powershell Blocked</figcaption></figure>
+
+<h1 id="smb-and-more-permissions">SMB and more Permissions</h1>
+
+<p>After creating the users and groups, I made SMB shares for each department.
+<img src="/images/shares.png" alt="" />
+Each department share is restricted so that only members of that department and the domain admins can access the share
+<img src="/images/Pasted%20image%2020240402184231.png" alt="" />
+As shown in the images below, Test User who is a member of the Sales department, is able to access the Sales share, but not the Legal share.
+<img src="/images/salesshare.png" alt="" />
+<img src="/images/legalshare.png" alt="" /></p>
+
+<p><a class="m-1 btn btn-outline-primary btn-3 btn-block" href="../projects/activedirectory">
+  Project Home
+</a></p>
+
+</div>
+  </main>
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>m121499</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center"><a class="social mx-1"  href="mailto:matthewwaskiewicz@outlook.com"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#db4437'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fas fa-envelope fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.github.com/m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#333333'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-github fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.linkedin.com/in/matthew-waskiewicz-493619301"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#007bb5'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-linkedin-in fa-1x"></i>
+    </a><a class="social mx-1"  href="https://medium.com/@m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#00ab6c'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-medium fa-1x"></i>
+    </a>
+
+</div><small id="attribution">
+    theme <a href="https://github.com/yousinix/portfolYOU">portfolYOU</a>
+  </small>
+
+</footer>
+
+  
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+
+</html>

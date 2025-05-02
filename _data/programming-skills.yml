@@ -1,0 +1,11 @@
+- name: Linux
+  percentage: 90
+  color: danger
+
+- name: Cisco CLI
+  percentage: 80
+  color:
+
+- name: Nmap
+  percentage: 95
+  color: secondary

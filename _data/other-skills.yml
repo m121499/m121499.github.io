@@ -1,0 +1,7 @@
+- name: Python
+  percentage: 95
+  color: info
+
+- name: Bash
+  percentage: 90
+  color: success
