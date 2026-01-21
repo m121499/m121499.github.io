@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+
+<!--
+  portfolYOU Jekyll theme by yousinix
+  Free for personal and commercial use under the MIT license
+  https://github.com/yousinix/portfolYOU
+-->
+
+<html lang="en" class="h-100">
+
+<head>
+
+  
+  
+  
+
+  
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pi-hole and Pi-VPN">
+  <meta property="og:description" content="Configured a raspberry Pi as a DHCP, DNS, and VPN server.">
+  <meta property="og:image" content="../images/pihole/pi.jpeg">
+
+  <title>Pi-hole and Pi-VPN</title>
+  <meta name="description" content="Configured a raspberry Pi as a DHCP, DNS, and VPN server.">
+
+  <link rel="shortcut icon" type="image/x-icon" href="/assets/favicon.ico">
+
+  <!-- Theme style -->
+  <script src="/assets/js/theme.js"></script>
+
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css">
+
+  <!-- Animate CSS CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.0/animate.css">
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/assets/css/style.css">
+
+</head>
+
+
+<body class="h-100 d-flex flex-column">
+
+  <main class="flex-shrink-0 container mt-5">
+    <nav class="navbar navbar-expand-lg navbar-themed">
+
+  <a class="navbar-brand" href="/"><h5><b>Matts portfolio</b></h5></a>
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-1x fa-bars text-themed"></i>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <div class="navbar-nav ml-auto"><a class="nav-item nav-link active" href="/projects/">Projects</a>
+
+      <a class="nav-item nav-link " href="/about/">About</a>
+
+      
+
+      <span id="theme-toggler" class="nav-item nav-link" role="button" onclick="toggleTheme()"></span>
+    </div>
+  </div>
+
+</nav>
+    <div class="col-lg-10 mx-auto mt-5 markdown-body">
+  <h1 id="about">About</h1>
+
+<p>For this project, I set up Pi-hole as a DNS server to block ads, trackers, and malicious domains across my entire network. This gave me greater visibility into the traffic on my network and helped me detect any suspicious behavior. I also configured Pi-hole to act as the DHCP server, which allows me to easily identify which devices are making specific DNS requests.</p>
+
+<p>To securely access my network from outside, I set up PiVPN using WireGuard. This lets me connect to my home network remotely, whether I’m on public Wi-Fi or traveling, and ensures all my traffic is encrypted. It also makes it easy to manage services like the Minecraft server I have running at home.</p>
+
+<h1 id="pi-hole-dashboard">Pi-hole Dashboard</h1>
+<p><img src="../images/pihole/pi-hole.png" alt="" />
+<img src="../images/pihole/pi-hole2.png" alt="" /></p>
+<h1 id="local-dns-records">Local DNS Records</h1>
+<p>With local DNS records I can access my switch, minecraft server, and raspberry pi via their domain name so I don’t have to type in the IP address every time. 
+<img src="../images/pihole/pi-hole3.png" alt="" />
+<img src="../images/pihole/pi-hole4.png" alt="" /></p>
+
+<h1 id="dhcp-settings">DHCP Settings</h1>
+<p>I chose to make Pi-hole the DHCP server instead of just pointing my router’s DNS settings to Pi-hole because, in that setup, all DNS requests appeared to come from the router. By letting Pi-hole handle DHCP, I can see the actual device names and IP addresses making each request, which gives me much better visibility and granularity when monitoring network activity.
+<img src="../images/pihole/pi-dhcp.png" alt="" /></p>
+<h1 id="example-query">Example Query</h1>
+<p><img src="../images/pihole/pihole-log.png" alt="" /></p>
+
+<p><a class="m-1 btn btn-outline-primary btn-3 btn-block" href="../projects/">
+  Project Home
+</a></p>
+
+
+</div>
+  </main>
+  <footer class="mt-auto py-3 text-center">
+
+  <small class="text-muted mb-2">
+    <i class="fas fa-code"></i> with <i class="fas fa-heart"></i>
+    by <strong>m121499</strong>
+  </small>
+
+  <div class="container-fluid justify-content-center"><a class="social mx-1"  href="mailto:matthewwaskiewicz@outlook.com"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#db4437'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fas fa-envelope fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.github.com/m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#333333'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-github fa-1x"></i>
+    </a><a class="social mx-1"  href="https://www.linkedin.com/in/matthew-waskiewicz-493619301"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#007bb5'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-linkedin-in fa-1x"></i>
+    </a><a class="social mx-1"  href="https://medium.com/@m121499"
+       style="color: #6c757d"
+       onMouseOver="this.style.color='#00ab6c'"
+       onMouseOut="this.style.color='#6c757d'">
+      <i class="fab fa-medium fa-1x"></i>
+    </a>
+
+</div><small id="attribution">
+    theme <a href="https://github.com/yousinix/portfolYOU">portfolYOU</a>
+  </small>
+
+</footer>
+
+  
+  <!-- GitHub Buttons -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+
+<!-- jQuery CDN -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Popper.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"></script>
+
+<!-- Bootstrap JS CDN -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!-- wow.js CDN & Activation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/wow/1.1.2/wow.js"></script>
+<script> new WOW().init(); </script>
+
+<!-- Initialize all tooltips -->
+<script>
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+</body>
+
+</html>
