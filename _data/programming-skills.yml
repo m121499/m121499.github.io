@@ -3,9 +3,9 @@
   color: danger
 
 - name: Cisco CLI
-  percentage: 80
+  percentage: 85
   color:
 
-- name: Nmap
-  percentage: 95
+- name: Active Directory
+  percentage: 80
   color: secondary
