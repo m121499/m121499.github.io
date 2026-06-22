@@ -32,8 +32,8 @@ I then got the certificate, added it to the group policy as a trusted cert, and 
 ![](../images/copycert.png)
 After getting the certificate on ubuntu I ran the following commands. 
 ```bash
-sudo cp "certnew (1).cer" /etc/ssl/certs/web1new.crt
-sudo cp web1new.key /etc/ssl/private/
+cp "certnew (1).cer" /etc/ssl/certs/web1new.crt
+cp web1new.key /etc/ssl/private/
 ```
 
 ***
